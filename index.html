@@ -313,7 +313,7 @@
     <script>
    
     // App Unlock Logic
-    const SECRET_PIN = "Techie2003"; 
+    const SECRET_PIN = "Raicsit@1001"; 
 
     // Check if already logged in today
     if(sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -464,7 +464,7 @@
             }
         }
 
-        async function submitSync() {
+      async function submitSync() {
             const t = document.getElementById('teacher').value.trim();
             const c = document.getElementById('course').value;
             const y = document.getElementById('year').value;
@@ -482,29 +482,37 @@
                 payload.push({ date, course: c, year: y, slot, teacher: t, rollNo: s.roll, name: s.name, status: status[s.id] });
             }
 
+            // 🔥 CHANGE HERE: Click hote hi turant blank window open hogi
+            const whatsappWindow = window.open('', '_blank');
+
             const btn = document.getElementById('subBtn');
             btn.disabled = true;
             btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing...";
 
             try {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("Attendance Sync Successful!");
                 
-                // WhatsApp Summary
+                // WhatsApp Summary Message
                 const pCount = payload.filter(x => x.status === 'Present').length;
                 const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${payload.length - pCount}\n👥 *Total:* ${payload.length}`;
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
                 
+                // 🔥 CHANGE HERE: Ab us window ka URL badal kar WhatsApp kar denge
+                if (whatsappWindow) {
+                    whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                }
+                
+                alert("Attendance Sync Successful!");
                 status = {};
                 render();
             } catch (e) {
+                // Agar error aaye toh blank window apne aap band ho jaye
+                if (whatsappWindow) whatsappWindow.close();
                 alert("Error: Check Internet Connection");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = "<i class='fas fa-cloud-upload-alt mr-2'></i> Submit Attendance";
             }
         }
-
         function loadData() { render(); }
     </script>
 </body>
