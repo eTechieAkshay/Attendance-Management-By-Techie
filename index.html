@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TechieDay Attendance - RAICSIT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        /* ----------------------------------------------------
+           THEME VARIABLES & CORE STYLES (Light - Orange & White)
+           ---------------------------------------------------- */
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            /* White & Orange Animated Gradient */
+            background: linear-gradient(-45deg, #f8fafc, #fff7ed, #ffedd5, #f8fafc);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #0f172a; /* Dark Slate Text */
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(249, 115, 22, 0.3); /* Orange Tint Border */
+            box-shadow: 0 8px 32px 0 rgba(249, 115, 22, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input {
+            background: rgba(249, 115, 22, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #0f172a;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus { border-color: #f97316; outline: none; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        .glass-input option { background-color: #ffffff; color: #0f172a; }
+
+        .text-main { color: #0f172a; transition: color 0.3s ease; }
+        .text-theme { color: #ea580c; transition: color 0.3s ease; } /* Orange */
+        .text-gradient {
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+            background-image: linear-gradient(to right, #ea580c, #f97316);
+        }
+        
+        .bg-theme-icon { background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.2); }
+        .btn-submit {
+            background: linear-gradient(to right, #ea580c, #f97316); color: white;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); border: 1px solid #fb923c;
+        }
+        .btn-submit:hover { background: linear-gradient(to right, #c2410c, #ea580c); }
+        
+        .btn-pa { border: 1px solid rgba(0,0,0,0.1); color: #64748b; }
+        .btn-pa:hover { background: rgba(0,0,0,0.05); color: #0f172a; }
+        
+        .card-hover { border-color: rgba(249, 115, 22, 0.2); }
+        .card-hover:hover { background: rgba(249, 115, 22, 0.03); }
+
+        .stats-bg { background: rgba(249, 115, 22, 0.08); }
+        .theme-border { border-color: rgba(0,0,0,0.1); }
+        .modal-header { background: rgba(249, 115, 22, 0.1); border-bottom: 1px solid rgba(249, 115, 22, 0.2); color: #ea580c; }
+        .btn-secondary { background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
+        .btn-secondary:hover { background: rgba(0,0,0,0.1); }
+
+        /* ----------------------------------------------------
+           DARK THEME VARIABLES (Glassmorphism) 
+           ---------------------------------------------------- */
+        body.dark { 
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a); 
+            background-size: 400% 400%; 
+            color: #f8fafc; 
+        }
+        body.dark .glass { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+        body.dark .glass-nav { background: rgba(15, 23, 42, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        body.dark .glass-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); color: #f8fafc; }
+        body.dark .glass-input:focus { border-color: #818cf8; box-shadow: 0 0 15px rgba(129, 140, 248, 0.3); }
+        body.dark .glass-input option { background-color: #1e1b4b; color: white; }
+        
+        body.dark .text-main { color: #f8fafc; }
+        body.dark .text-theme { color: #818cf8; } /* Indigo */
+        body.dark .text-gradient { background-image: linear-gradient(to right, #c7d2fe, #ffffff); }
+        
+        body.dark .bg-theme-icon { background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.3); }
+        body.dark .btn-submit {
+            background: linear-gradient(to right, #4f46e5, #2563eb);
+            box-shadow: 0 0 20px rgba(79,70,229,0.4); border: 1px solid rgba(129,140,248,0.3);
+        }
+        body.dark .btn-submit:hover { background: linear-gradient(to right, #4338ca, #1d4ed8); }
+        
+        body.dark .btn-pa { border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; }
+        body.dark .btn-pa:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        
+        body.dark .card-hover { border-color: rgba(255, 255, 255, 0.1); }
+        body.dark .card-hover:hover { background: rgba(255, 255, 255, 0.05); }
+
+        body.dark .stats-bg { background: rgba(0, 0, 0, 0.2); }
+        body.dark .theme-border { border-color: rgba(255,255,255,0.1); }
+        body.dark .modal-header { background: rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); color: #fff; }
+        body.dark .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; }
+        body.dark .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+        /* Modal specific styling */
+        .modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            z-index: 1000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; 
+        }
+        .modal.show { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        select, input { -webkit-appearance: none; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150,150,150,0.5); }
+    </style>
+</head>
+<body class="antialiased selection:bg-orange-500 selection:text-white dark" id="appBody">
+    <!-- GLOBAL LOGIN LOCK -->
+<div id="globalLock" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center px-4 transition-opacity duration-500">
+    <div class="glass p-8 rounded-2xl max-w-sm w-full text-center border border-white/10 shadow-2xl">
+        <div class="w-16 h-16 mx-auto bg-indigo-500/20 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-lock text-2xl text-indigo-400"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Faculty Login</h2>
+        <p class="text-sm text-gray-300 mb-6">Enter PIN to access attendance system</p>
+        
+        <input type="password" id="appPin" placeholder="Enter PIN" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[10px] font-bold outline-none focus:border-indigo-500 mb-4">
+        
+        <button onclick="unlockApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)]">
+            Unlock App
+        </button>
+        <p id="errorMsg" class="text-red-400 text-sm mt-3 hidden font-medium">Incorrect PIN!</p>
+    </div>
+</div>
+
+
+
+    <!-- Top Toolbar (Glassmorphism Nav) -->
+    <nav class="glass-nav p-4 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-theme-icon p-2 rounded-xl">
+                    <i class="fas fa-graduation-cap text-theme text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold tracking-wide text-gradient">RAICSIT</h1>
+                    <p class="text-[10px] md:text-xs text-theme uppercase tracking-widest font-medium opacity-80">Student Attendance</p>
+                </div>
+            </div>
+            <div class="flex gap-2 items-center">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
+                    <i id="themeIcon" class="fas fa-sun text-lg text-theme transition-colors"></i>
+                </button>
+                <!-- Add Student -->
+                <button onclick="openModal('studentModal')" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
+                    <i class="fas fa-user-plus text-lg text-theme transition-colors"></i>
+                </button>
+                <!-- Admin -->
+                <button onclick="openModal('adminModal')" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
+                    <i class="fas fa-chart-line text-lg text-theme transition-colors"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-8">
+        
+        <!-- Selection Card -->
+        <div class="md:col-span-4 lg:col-span-3">
+            <div class="glass rounded-2xl p-5 space-y-5 md:sticky md:top-28">
+                
+                <div class="flex items-center gap-3 bg-theme-icon p-3 rounded-xl">
+                    <i class="fas fa-calendar-day text-theme"></i>
+                    <input type="date" id="attDate" class="w-full bg-transparent font-medium text-main outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="relative">
+                        <select id="course" onchange="loadData()" class="w-full p-3.5 rounded-xl glass-input outline-none text-sm font-medium cursor-pointer">
+                            <option value="">Course</option>
+                            <option>MCA</option><option>MBA</option><option>BCA</option><option>BBA</option><option>BCCA</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-4 text-xs text-theme opacity-70 pointer-events-none"></i>
+                    </div>
+                    <div class="relative">
+                        <select id="year" onchange="loadData()" class="w-full p-3.5 rounded-xl glass-input outline-none text-sm font-medium cursor-pointer">
+                            <option value="">Year</option>
+                            <option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-4 text-xs text-theme opacity-70 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <i class="fas fa-chalkboard-teacher absolute left-4 top-4 text-theme opacity-80"></i>
+                    <input type="text" id="teacher" placeholder="Teacher Name" class="w-full p-3.5 pl-11 rounded-xl glass-input outline-none text-sm font-medium">
+                </div>
+
+                <div class="relative">
+                    <i class="fas fa-clock absolute left-4 top-4 text-theme opacity-80 pointer-events-none"></i>
+                    <select id="slot" class="w-full p-3.5 pl-11 rounded-xl glass-input outline-none text-sm font-medium cursor-pointer">
+                        <option>10:45 - 11:30 AM</option><option>11:30 - 12:15 PM</option><option>12:30 - 01:15 PM</option>
+                        <option>01:15 - 02:00 PM</option><option>02:30 - 03:15 PM</option><option>03:15 - 04:00 PM</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-4 text-xs text-theme opacity-70 pointer-events-none"></i>
+                </div>
+
+                <div class="flex items-center rounded-xl px-4 glass-input group focus-within:border-theme">
+                    <i class="fas fa-search text-theme opacity-70 group-focus-within:opacity-100"></i>
+                    <input type="text" id="search" oninput="render()" placeholder="Search Student..." class="w-full p-3.5 pl-3 bg-transparent outline-none text-sm text-main">
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex gap-3 pt-2">
+                    <button onclick="markAll('Present')" class="flex-1 bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-green-500/30 transition-all shadow-sm hover:shadow-md">Mark All P</button>
+                    <button onclick="markAll('Absent')" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-red-500/30 transition-all shadow-sm hover:shadow-md">Mark All A</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student List Container -->
+        <div class="md:col-span-8 lg:col-span-9 flex flex-col">
+            <div id="list" class="space-y-3">
+                <!-- Data will be injected here -->
+            </div>
+            
+            <!-- BULLETPROOF FIX: Huge invisible spacer at the end of the list to guarantee scroll clearance -->
+            <div class="h-48 w-full flex-shrink-0"></div> 
+        </div>
+    </div>
+
+    <!-- Floating Bottom Action Bar -->
+    <div class="fixed bottom-4 left-4 right-4 md:left-1/2 md:transform md:-translate-x-1/2 md:w-[calc(100%-2rem)] md:max-w-7xl glass rounded-2xl p-4 z-40 border theme-border shadow-2xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+            <div class="flex justify-around md:justify-start md:gap-8 px-2 font-bold text-sm md:text-base stats-bg p-2 md:p-3 rounded-xl">
+                <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#4ade80]"></div><span class="text-main opacity-80">Present:</span> <span id="pTxt" class="text-green-600 dark:text-green-400 text-lg">0</span></span>
+                <div class="w-px h-5 theme-border border-l"></div>
+                <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#f87171]"></div><span class="text-main opacity-80">Absent:</span> <span id="aTxt" class="text-red-600 dark:text-red-400 text-lg">0</span></span>
+            </div>
+            <button id="subBtn" onclick="submitSync()" class="w-full md:w-auto md:px-12 btn-submit py-3.5 md:py-4 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-widest text-sm">
+                <i class="fas fa-cloud-upload-alt mr-2"></i> Submit Attendance
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD STUDENT (MANUAL & CSV) -->
+    <div id="studentModal" class="modal px-4">
+        <div class="glass rounded-2xl w-full max-w-sm overflow-hidden border theme-border shadow-2xl">
+            <div class="modal-header p-5 font-semibold flex justify-between items-center backdrop-blur-md">
+                <div class="flex items-center gap-2"><i class="fas fa-user-plus"></i> <span class="text-main font-bold">Add Student</span></div>
+                <button onclick="closeModal('studentModal')" class="hover:bg-black/10 dark:hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-main"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="text" id="mRoll" placeholder="Roll Number" class="w-full p-3.5 rounded-xl glass-input">
+                <input type="text" id="mName" placeholder="Full Name" class="w-full p-3.5 rounded-xl glass-input">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="mCourse" class="w-full p-3.5 rounded-xl glass-input"><option>MCA</option><option>MBA</option><option>BCA</option><option>BBA</option><option>BCCA</option></select>
+                    <select id="mYear" class="w-full p-3.5 rounded-xl glass-input"><option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option></select>
+                </div>
+                <button onclick="addManual()" class="w-full btn-submit py-3.5 rounded-xl font-bold uppercase tracking-wider transition-all">Add Student</button>
+                
+                <div class="flex items-center justify-center gap-3 py-2 opacity-60">
+                    <div class="h-px theme-border border-b flex-1"></div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-main">OR</span>
+                    <div class="h-px theme-border border-b flex-1"></div>
+                </div>
+                
+                <button onclick="document.getElementById('csv').click()" class="w-full btn-secondary py-3.5 rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors">
+                    <i class="fas fa-file-csv text-green-600 dark:text-green-400 text-lg"></i> Bulk Import CSV
+                </button>
+                <input type="file" id="csv" class="hidden" accept=".csv" onchange="importCSV(this)">
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN LOGIN -->
+    <div id="adminModal" class="modal px-4">
+        <div class="glass rounded-2xl w-full max-w-xs p-8 space-y-6 text-center border theme-border shadow-2xl">
+            <div class="w-16 h-16 mx-auto bg-theme-icon rounded-full flex items-center justify-center">
+                <i class="fas fa-shield-alt text-2xl text-theme"></i>
+            </div>
+            <h3 class="font-semibold text-xl text-main tracking-wide">Admin Access</h3>
+            <input type="password" id="pin" placeholder="••••" class="w-full p-4 rounded-xl glass-input text-center text-3xl tracking-[15px] font-bold" maxlength="4">
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeModal('adminModal')" class="flex-1 py-3 rounded-xl btn-secondary font-medium transition-colors">Cancel</button>
+                <button onclick="checkAdmin()" class="flex-1 btn-submit py-3 rounded-xl font-bold transition-all">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+   
+    // App Unlock Logic
+    const SECRET_PIN = "Techie2003"; 
+
+    // Check if already logged in today
+    if(sessionStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('globalLock').style.display = 'none';
+    }
+
+    function unlockApp() {
+        const input = document.getElementById('appPin').value;
+        if(input === SECRET_PIN) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            const lock = document.getElementById('globalLock');
+            lock.style.opacity = '0';
+            setTimeout(() => lock.style.display = 'none', 500); // Smooth fade out
+        } else {
+            document.getElementById('errorMsg').classList.remove('hidden');
+            setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000);
+        }
+    }
+
+        // --- Theme Logic ---
+        function toggleTheme() {
+            const body = document.getElementById('appBody');
+            const icon = document.getElementById('themeIcon');
+            if(body.classList.contains('dark')) {
+                body.classList.remove('dark'); // Switched to White & Orange
+                localStorage.setItem('raicsit_theme', 'light');
+                icon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                body.classList.add('dark'); // Switched to Dark Glassmorphism
+                localStorage.setItem('raicsit_theme', 'dark');
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+        
+        // Init theme on load
+        if(localStorage.getItem('raicsit_theme') === 'light') {
+            document.getElementById('appBody').classList.remove('dark');
+            document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+        }
+
+        // --- Core Logic ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbwq4JwCDkOTINa7Tkfmk0nZok-4HUD9A_WO4pt66LZG21LLW68Kw6TGvB6XW8ebepMS/exec";
+        let students = JSON.parse(localStorage.getItem('techie_db')) || [];
+        let status = {};
+
+        document.getElementById('attDate').valueAsDate = new Date();
+
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function render() {
+            const c = document.getElementById('course').value;
+            const y = document.getElementById('year').value;
+            const s = document.getElementById('search').value.toLowerCase();
+            const list = document.getElementById('list');
+
+            if (!c || !y) {
+                list.innerHTML = '<div class="glass p-10 mt-4 rounded-2xl flex flex-col items-center justify-center text-center border theme-border"><div class="w-16 h-16 bg-theme-icon rounded-full flex items-center justify-center mb-4"><i class="fas fa-layer-group text-3xl text-theme opacity-80"></i></div><h3 class="text-lg font-medium text-main mb-1">Select Criteria</h3><p class="text-sm text-main opacity-60">Choose Course and Year to view students</p></div>';
+                return;
+            }
+
+            const filtered = students.filter(x => x.course === c && x.year == y && (x.name.toLowerCase().includes(s) || x.roll.includes(s)));
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="glass p-10 mt-4 rounded-2xl flex flex-col items-center justify-center text-center border theme-border"><div class="w-16 h-16 bg-theme-icon rounded-full flex items-center justify-center mb-4"><i class="fas fa-users-slash text-3xl text-theme opacity-80"></i></div><h3 class="text-lg font-medium text-main mb-1">No Students Found</h3><p class="text-sm text-main opacity-60">Click the + icon in top nav to add students.</p></div>';
+                return;
+            }
+
+            // Updated List item with abstract classes for theme toggle
+            list.innerHTML = filtered.map(item => `
+                <div class="glass p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 ${status[item.id] ? (status[item.id] === 'Present' ? 'border-green-500 bg-green-500/5' : 'border-red-500 bg-red-500/5') : 'card-hover'} transition-all duration-300 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-theme-icon border theme-border flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user text-theme"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-main text-base sm:text-lg tracking-wide transition-colors">${item.name}</div>
+                            <div class="text-[11px] sm:text-xs text-theme font-medium uppercase mt-0.5 tracking-widest flex items-center gap-1 opacity-90"><i class="fas fa-id-card"></i> ${item.roll}</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                        <button onclick="setAt(${item.id}, 'Present')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Present' ? 'bg-green-500 text-white border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] scale-[1.02]' : 'btn-pa'}">P</button>
+                        <button onclick="setAt(${item.id}, 'Absent')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Absent' ? 'bg-red-500 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-[1.02]' : 'btn-pa'}">A</button>
+                    </div>
+                </div>
+            `).join('');
+            updateUI();
+        }
+
+        function setAt(id, val) { status[id] = val; render(); }
+
+        function updateUI() {
+            const vals = Object.values(status);
+            document.getElementById('pTxt').innerText = vals.filter(v => v === 'Present').length;
+            document.getElementById('aTxt').innerText = vals.filter(v => v === 'Absent').length;
+        }
+
+        function markAll(val) {
+            const c = document.getElementById('course').value;
+            const y = document.getElementById('year').value;
+            students.filter(x => x.course === c && x.year == y).forEach(x => status[x.id] = val);
+            render();
+        }
+
+        function addManual() {
+            const roll = document.getElementById('mRoll').value.trim();
+            const name = document.getElementById('mName').value.trim();
+            const course = document.getElementById('mCourse').value;
+            const year = document.getElementById('mYear').value;
+
+            if(!roll || !name) return alert("Fill all fields");
+            if(students.some(s => s.roll === roll && s.course === course)) return alert("Duplicate Roll Number!");
+
+            students.push({ id: Date.now(), roll, name, course, year });
+            localStorage.setItem('techie_db', JSON.stringify(students));
+            alert("Student Added!");
+            closeModal('studentModal');
+            render();
+        }
+
+        function importCSV(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const lines = e.target.result.split('\n');
+                let added = 0;
+                lines.forEach((line, i) => {
+                    if(i === 0 || !line.trim()) return;
+                    const p = line.split(',');
+                    if(p.length >= 4) {
+                        students.push({ id: Date.now() + i, roll: p[0].trim(), name: p[1].trim(), course: p[2].trim(), year: p[3].replace(/[^0-9]/g, '') });
+                        added++;
+                    }
+                });
+                localStorage.setItem('techie_db', JSON.stringify(students));
+                alert(`Imported ${added} Students!`);
+                closeModal('studentModal');
+                render();
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        function checkAdmin() {
+            if(document.getElementById('pin').value === "1001") {
+                alert("Login Successful! Report system ready.");
+                closeModal('adminModal');
+            } else {
+                alert("Wrong PIN!");
+            }
+        }
+
+        async function submitSync() {
+            const t = document.getElementById('teacher').value.trim();
+            const c = document.getElementById('course').value;
+            const y = document.getElementById('year').value;
+            const slot = document.getElementById('slot').value;
+            const date = document.getElementById('attDate').value;
+
+            if(!t || !c || !y) return alert("Fill Teacher, Course & Year!");
+
+            const current = students.filter(x => x.course === c && x.year == y);
+            if(current.length === 0) return alert("No students to mark!");
+
+            const payload = [];
+            for(let s of current) {
+                if(!status[s.id]) return alert("Please mark attendance for: " + s.name);
+                payload.push({ date, course: c, year: y, slot, teacher: t, rollNo: s.roll, name: s.name, status: status[s.id] });
+            }
+
+            const btn = document.getElementById('subBtn');
+            btn.disabled = true;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing...";
+
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("Attendance Sync Successful!");
+                
+                // WhatsApp Summary
+                const pCount = payload.filter(x => x.status === 'Present').length;
+                const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${payload.length - pCount}\n👥 *Total:* ${payload.length}`;
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+                
+                status = {};
+                render();
+            } catch (e) {
+                alert("Error: Check Internet Connection");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "<i class='fas fa-cloud-upload-alt mr-2'></i> Submit Attendance";
+            }
+        }
+
+        function loadData() { render(); }
+    </script>
+</body>
+</html>
