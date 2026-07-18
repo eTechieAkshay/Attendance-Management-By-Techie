@@ -9,16 +9,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
-        /* ----------------------------------------------------
-           THEME VARIABLES & CORE STYLES (Light - Orange & White)
-           ---------------------------------------------------- */
         body { 
             font-family: 'Poppins', sans-serif; 
-            /* White & Orange Animated Gradient */
             background: linear-gradient(-45deg, #f8fafc, #fff7ed, #ffedd5, #f8fafc);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            color: #0f172a; /* Dark Slate Text */
+            color: #0f172a; 
             min-height: 100vh;
             transition: all 0.3s ease;
         }
@@ -33,7 +29,7 @@
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(249, 115, 22, 0.3); /* Orange Tint Border */
+            border: 1px solid rgba(249, 115, 22, 0.3);
             box-shadow: 0 8px 32px 0 rgba(249, 115, 22, 0.08);
             transition: all 0.3s ease;
         }
@@ -56,7 +52,7 @@
         .glass-input option { background-color: #ffffff; color: #0f172a; }
 
         .text-main { color: #0f172a; transition: color 0.3s ease; }
-        .text-theme { color: #ea580c; transition: color 0.3s ease; } /* Orange */
+        .text-theme { color: #ea580c; transition: color 0.3s ease; }
         .text-gradient {
             background-clip: text; -webkit-background-clip: text; color: transparent;
             background-image: linear-gradient(to right, #ea580c, #f97316);
@@ -81,9 +77,7 @@
         .btn-secondary { background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
         .btn-secondary:hover { background: rgba(0,0,0,0.1); }
 
-        /* ----------------------------------------------------
-           DARK THEME VARIABLES (Glassmorphism) 
-           ---------------------------------------------------- */
+        /* DARK THEME VARIABLES */
         body.dark { 
             background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a); 
             background-size: 400% 400%; 
@@ -96,7 +90,7 @@
         body.dark .glass-input option { background-color: #1e1b4b; color: white; }
         
         body.dark .text-main { color: #f8fafc; }
-        body.dark .text-theme { color: #818cf8; } /* Indigo */
+        body.dark .text-theme { color: #818cf8; } 
         body.dark .text-gradient { background-image: linear-gradient(to right, #c7d2fe, #ffffff); }
         
         body.dark .bg-theme-icon { background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.3); }
@@ -118,7 +112,6 @@
         body.dark .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; }
         body.dark .btn-secondary:hover { background: rgba(255,255,255,0.1); }
 
-        /* Modal specific styling */
         .modal { 
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
             backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -135,25 +128,24 @@
     </style>
 </head>
 <body class="antialiased selection:bg-orange-500 selection:text-white dark" id="appBody">
+
     <!-- GLOBAL LOGIN LOCK -->
-<div id="globalLock" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center px-4 transition-opacity duration-500">
-    <div class="glass p-8 rounded-2xl max-w-sm w-full text-center border border-white/10 shadow-2xl">
-        <div class="w-16 h-16 mx-auto bg-indigo-500/20 rounded-full flex items-center justify-center mb-4">
-            <i class="fas fa-lock text-2xl text-indigo-400"></i>
+    <div id="globalLock" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center px-4 transition-opacity duration-500">
+        <div class="glass p-8 rounded-2xl max-w-sm w-full text-center border border-white/10 shadow-2xl">
+            <div class="w-16 h-16 mx-auto bg-indigo-500/20 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-lock text-2xl text-indigo-400"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Faculty Login</h2>
+            <p class="text-sm text-gray-300 mb-6">Enter PIN to access attendance system</p>
+            
+            <input type="password" id="appPin" placeholder="Enter PIN" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[10px] font-bold outline-none focus:border-indigo-500 mb-4">
+            
+            <button onclick="unlockApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)]">
+                Unlock App
+            </button>
+            <p id="errorMsg" class="text-red-400 text-sm mt-3 hidden font-medium">Incorrect PIN!</p>
         </div>
-        <h2 class="text-xl font-bold text-white mb-2">Faculty Login</h2>
-        <p class="text-sm text-gray-300 mb-6">Enter PIN to access attendance system</p>
-        
-        <input type="password" id="appPin" placeholder="Enter PIN" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[10px] font-bold outline-none focus:border-indigo-500 mb-4">
-        
-        <button onclick="unlockApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)]">
-            Unlock App
-        </button>
-        <p id="errorMsg" class="text-red-400 text-sm mt-3 hidden font-medium">Incorrect PIN!</p>
     </div>
-</div>
-
-
 
     <!-- Top Toolbar (Glassmorphism Nav) -->
     <nav class="glass-nav p-4 sticky top-0 z-50 shadow-lg">
@@ -168,15 +160,12 @@
                 </div>
             </div>
             <div class="flex gap-2 items-center">
-                <!-- Theme Toggle Button -->
                 <button onclick="toggleTheme()" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
                     <i id="themeIcon" class="fas fa-sun text-lg text-theme transition-colors"></i>
                 </button>
-                <!-- Add Student -->
                 <button onclick="openModal('studentModal')" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
                     <i class="fas fa-user-plus text-lg text-theme transition-colors"></i>
                 </button>
-                <!-- Admin -->
                 <button onclick="openModal('adminModal')" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
                     <i class="fas fa-chart-line text-lg text-theme transition-colors"></i>
                 </button>
@@ -213,9 +202,28 @@
                     </div>
                 </div>
 
+                <!-- Teacher Name Dropdown -->
                 <div class="relative">
-                    <i class="fas fa-chalkboard-teacher absolute left-4 top-4 text-theme opacity-80"></i>
-                    <input type="text" id="teacher" placeholder="Teacher Name" class="w-full p-3.5 pl-11 rounded-xl glass-input outline-none text-sm font-medium">
+                    <i class="fas fa-chalkboard-teacher absolute left-4 top-4 text-theme opacity-80 z-10 pointer-events-none"></i>
+                    <select id="teacher" class="w-full p-3.5 pl-11 rounded-xl glass-input outline-none text-sm font-medium cursor-pointer">
+                        <option value="">Select Teacher Name</option>
+                        <option>Dr. Ritesh Sule</option>
+                        <option>Dr. Smita Kalokar</option>
+                        <option>Dr.Shradhha Wani</option>
+                        <option>Prof. Amol Mankar</option>
+                        <option>Prof. Pratik Wankhede</option>
+                        <option>Prof. Neha Ankar</option>
+                        <option>Prof. Kajal Dongare</option>
+                        <option>Prof. Varsha Khevale</option>
+                        <option>Prof. shamal Dongare</option>
+                        <option>Prof. Mohini Masram</option>
+                        <option>Prof. Nikita Rajurkar</option>
+                        <option>Prof. Ashwini Kapile</option>
+                        <option>Prof. Kiran Gujar</option>
+                        <option>Library- Chitra Mam</option>
+                        <option> Computer Lab - Krunal Tadas Sir</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-4 text-xs text-theme opacity-70 pointer-events-none"></i>
                 </div>
 
                 <div class="relative">
@@ -245,8 +253,6 @@
             <div id="list" class="space-y-3">
                 <!-- Data will be injected here -->
             </div>
-            
-            <!-- BULLETPROOF FIX: Huge invisible spacer at the end of the list to guarantee scroll clearance -->
             <div class="h-48 w-full flex-shrink-0"></div> 
         </div>
     </div>
@@ -265,7 +271,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ADD STUDENT (MANUAL & CSV) -->
+    <!-- MODAL: ADD STUDENT -->
     <div id="studentModal" class="modal px-4">
         <div class="glass rounded-2xl w-full max-w-sm overflow-hidden border theme-border shadow-2xl">
             <div class="modal-header p-5 font-semibold flex justify-between items-center backdrop-blur-md">
@@ -311,11 +317,8 @@
     </div>
 
     <script>
-   
-    // App Unlock Logic
     const SECRET_PIN = "Raicsit@1001"; 
 
-    // Check if already logged in today
     if(sessionStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('globalLock').style.display = 'none';
     }
@@ -326,194 +329,195 @@
             sessionStorage.setItem('isLoggedIn', 'true');
             const lock = document.getElementById('globalLock');
             lock.style.opacity = '0';
-            setTimeout(() => lock.style.display = 'none', 500); // Smooth fade out
+            setTimeout(() => lock.style.display = 'none', 500);
         } else {
             document.getElementById('errorMsg').classList.remove('hidden');
             setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000);
         }
     }
 
-        // --- Theme Logic ---
-        function toggleTheme() {
-            const body = document.getElementById('appBody');
-            const icon = document.getElementById('themeIcon');
-            if(body.classList.contains('dark')) {
-                body.classList.remove('dark'); // Switched to White & Orange
-                localStorage.setItem('raicsit_theme', 'light');
-                icon.classList.replace('fa-sun', 'fa-moon');
-            } else {
-                body.classList.add('dark'); // Switched to Dark Glassmorphism
-                localStorage.setItem('raicsit_theme', 'dark');
-                icon.classList.replace('fa-moon', 'fa-sun');
-            }
+    function toggleTheme() {
+        const body = document.getElementById('appBody');
+        const icon = document.getElementById('themeIcon');
+        if(body.classList.contains('dark')) {
+            body.classList.remove('dark');
+            localStorage.setItem('raicsit_theme', 'light');
+            icon.classList.replace('fa-sun', 'fa-moon');
+        } else {
+            body.classList.add('dark');
+            localStorage.setItem('raicsit_theme', 'dark');
+            icon.classList.replace('fa-moon', 'fa-sun');
         }
-        
-        // Init theme on load
-        if(localStorage.getItem('raicsit_theme') === 'light') {
-            document.getElementById('appBody').classList.remove('dark');
-            document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+    }
+    
+    if(localStorage.getItem('raicsit_theme') === 'light') {
+        document.getElementById('appBody').classList.remove('dark');
+        document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+    }
+
+    const API_URL = "https://script.google.com/macros/s/AKfycbwq4JwCDkOTINa7Tkfmk0nZok-4HUD9A_WO4pt66LZG21LLW68Kw6TGvB6XW8ebepMS/exec";
+    let students = JSON.parse(localStorage.getItem('techie_db')) || [];
+    let status = {};
+
+    document.getElementById('attDate').valueAsDate = new Date();
+
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function render() {
+        const c = document.getElementById('course').value;
+        const y = document.getElementById('year').value;
+        const s = document.getElementById('search').value.toLowerCase();
+        const list = document.getElementById('list');
+
+        if (!c || !y) {
+            list.innerHTML = '<div class="glass p-10 mt-4 rounded-2xl flex flex-col items-center justify-center text-center border theme-border"><div class="w-16 h-16 bg-theme-icon rounded-full flex items-center justify-center mb-4"><i class="fas fa-layer-group text-3xl text-theme opacity-80"></i></div><h3 class="text-lg font-medium text-main mb-1">Select Criteria</h3><p class="text-sm text-main opacity-60">Choose Course and Year to view students</p></div>';
+            return;
         }
 
-        // --- Core Logic ---
-        const API_URL = "https://script.google.com/macros/s/AKfycbwq4JwCDkOTINa7Tkfmk0nZok-4HUD9A_WO4pt66LZG21LLW68Kw6TGvB6XW8ebepMS/exec";
-        let students = JSON.parse(localStorage.getItem('techie_db')) || [];
-        let status = {};
+        const filtered = students.filter(x => x.course === c && x.year == y && (x.name.toLowerCase().includes(s) || x.roll.includes(s)));
 
-        document.getElementById('attDate').valueAsDate = new Date();
+        if (filtered.length === 0) {
+            list.innerHTML = '<div class="glass p-10 mt-4 rounded-2xl flex flex-col items-center justify-center text-center border theme-border"><div class="w-16 h-16 bg-theme-icon rounded-full flex items-center justify-center mb-4"><i class="fas fa-users-slash text-3xl text-theme opacity-80"></i></div><h3 class="text-lg font-medium text-main mb-1">No Students Found</h3><p class="text-sm text-main opacity-60">Click the + icon in top nav to add students.</p></div>';
+            return;
+        }
 
-        function openModal(id) { document.getElementById(id).classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-        function render() {
-            const c = document.getElementById('course').value;
-            const y = document.getElementById('year').value;
-            const s = document.getElementById('search').value.toLowerCase();
-            const list = document.getElementById('list');
-
-            if (!c || !y) {
-                list.innerHTML = '<div class="glass p-10 mt-4 rounded-2xl flex flex-col items-center justify-center text-center border theme-border"><div class="w-16 h-16 bg-theme-icon rounded-full flex items-center justify-center mb-4"><i class="fas fa-layer-group text-3xl text-theme opacity-80"></i></div><h3 class="text-lg font-medium text-main mb-1">Select Criteria</h3><p class="text-sm text-main opacity-60">Choose Course and Year to view students</p></div>';
-                return;
-            }
-
-            const filtered = students.filter(x => x.course === c && x.year == y && (x.name.toLowerCase().includes(s) || x.roll.includes(s)));
-
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="glass p-10 mt-4 rounded-2xl flex flex-col items-center justify-center text-center border theme-border"><div class="w-16 h-16 bg-theme-icon rounded-full flex items-center justify-center mb-4"><i class="fas fa-users-slash text-3xl text-theme opacity-80"></i></div><h3 class="text-lg font-medium text-main mb-1">No Students Found</h3><p class="text-sm text-main opacity-60">Click the + icon in top nav to add students.</p></div>';
-                return;
-            }
-
-            // Updated List item with abstract classes for theme toggle
-            list.innerHTML = filtered.map(item => `
-                <div class="glass p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 ${status[item.id] ? (status[item.id] === 'Present' ? 'border-green-500 bg-green-500/5' : 'border-red-500 bg-red-500/5') : 'card-hover'} transition-all duration-300 group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-theme-icon border theme-border flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-user text-theme"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-main text-base sm:text-lg tracking-wide transition-colors">${item.name}</div>
-                            <div class="text-[11px] sm:text-xs text-theme font-medium uppercase mt-0.5 tracking-widest flex items-center gap-1 opacity-90"><i class="fas fa-id-card"></i> ${item.roll}</div>
-                        </div>
+        list.innerHTML = filtered.map(item => `
+            <div class="glass p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 ${status[item.id] ? (status[item.id] === 'Present' ? 'border-green-500 bg-green-500/5' : 'border-red-500 bg-red-500/5') : 'card-hover'} transition-all duration-300 group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-theme-icon border theme-border flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-theme"></i>
                     </div>
-                    <div class="flex gap-2 sm:gap-3 w-full sm:w-auto">
-                        <button onclick="setAt(${item.id}, 'Present')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Present' ? 'bg-green-500 text-white border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] scale-[1.02]' : 'btn-pa'}">P</button>
-                        <button onclick="setAt(${item.id}, 'Absent')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Absent' ? 'bg-red-500 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-[1.02]' : 'btn-pa'}">A</button>
+                    <div>
+                        <div class="font-semibold text-main text-base sm:text-lg tracking-wide transition-colors">${item.name}</div>
+                        <div class="text-[11px] sm:text-xs text-theme font-medium uppercase mt-0.5 tracking-widest flex items-center gap-1 opacity-90"><i class="fas fa-id-card"></i> ${item.roll}</div>
                     </div>
                 </div>
-            `).join('');
-            updateUI();
-        }
+                <div class="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                    <button onclick="setAt(${item.id}, 'Present')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Present' ? 'bg-green-500 text-white border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] scale-[1.02]' : 'btn-pa'}">P</button>
+                    <button onclick="setAt(${item.id}, 'Absent')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Absent' ? 'bg-red-500 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-[1.02]' : 'btn-pa'}">A</button>
+                </div>
+            </div>
+        `).join('');
+        updateUI();
+    }
 
-        function setAt(id, val) { status[id] = val; render(); }
+    function setAt(id, val) { status[id] = val; render(); }
 
-        function updateUI() {
-            const vals = Object.values(status);
-            document.getElementById('pTxt').innerText = vals.filter(v => v === 'Present').length;
-            document.getElementById('aTxt').innerText = vals.filter(v => v === 'Absent').length;
-        }
+    function updateUI() {
+        const vals = Object.values(status);
+        document.getElementById('pTxt').innerText = vals.filter(v => v === 'Present').length;
+        document.getElementById('aTxt').innerText = vals.filter(v => v === 'Absent').length;
+    }
 
-        function markAll(val) {
-            const c = document.getElementById('course').value;
-            const y = document.getElementById('year').value;
-            students.filter(x => x.course === c && x.year == y).forEach(x => status[x.id] = val);
-            render();
-        }
+    function markAll(val) {
+        const c = document.getElementById('course').value;
+        const y = document.getElementById('year').value;
+        students.filter(x => x.course === c && x.year == y).forEach(x => status[x.id] = val);
+        render();
+    }
 
-        function addManual() {
-            const roll = document.getElementById('mRoll').value.trim();
-            const name = document.getElementById('mName').value.trim();
-            const course = document.getElementById('mCourse').value;
-            const year = document.getElementById('mYear').value;
+    function addManual() {
+        const roll = document.getElementById('mRoll').value.trim();
+        const name = document.getElementById('mName').value.trim();
+        const course = document.getElementById('mCourse').value;
+        const year = document.getElementById('mYear').value;
 
-            if(!roll || !name) return alert("Fill all fields");
-            if(students.some(s => s.roll === roll && s.course === course)) return alert("Duplicate Roll Number!");
+        if(!roll || !name) return alert("Fill all fields");
+        if(students.some(s => s.roll === roll && s.course === course)) return alert("Duplicate Roll Number!");
 
-            students.push({ id: Date.now(), roll, name, course, year });
+        students.push({ id: Date.now(), roll, name, course, year });
+        localStorage.setItem('techie_db', JSON.stringify(students));
+        alert("Student Added!");
+        closeModal('studentModal');
+        render();
+    }
+
+    function importCSV(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const lines = e.target.result.split('\n');
+            let added = 0;
+            lines.forEach((line, i) => {
+                if(i === 0 || !line.trim()) return;
+                const p = line.split(',');
+                if(p.length >= 4) {
+                    students.push({ id: Date.now() + i, roll: p[0].trim(), name: p[1].trim(), course: p[2].trim(), year: p[3].replace(/[^0-9]/g, '') });
+                    added++;
+                }
+            });
             localStorage.setItem('techie_db', JSON.stringify(students));
-            alert("Student Added!");
+            alert(`Imported ${added} Students!`);
             closeModal('studentModal');
             render();
+        };
+        reader.readAsText(input.files[0]);
+    }
+
+    function checkAdmin() {
+        if(document.getElementById('pin').value === "1001") {
+            alert("Login Successful! Report system ready.");
+            closeModal('adminModal');
+        } else {
+            alert("Wrong PIN!");
+        }
+    }
+
+    async function submitSync() {
+        const t = document.getElementById('teacher').value.trim();
+        const c = document.getElementById('course').value;
+        const y = document.getElementById('year').value;
+        const slot = document.getElementById('slot').value;
+        const date = document.getElementById('attDate').value;
+
+        if(!t || !c || !y) return alert("Fill Teacher, Course & Year!");
+
+        const current = students.filter(x => x.course === c && x.year == y);
+        if(current.length === 0) return alert("No students to mark!");
+
+        const payload = [];
+        for(let s of current) {
+            payload.push({ date, course: c, year: y, slot, teacher: t, rollNo: s.roll, name: s.name, status: status[s.id] || 'Absent' });
         }
 
-        function importCSV(input) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const lines = e.target.result.split('\n');
-                let added = 0;
-                lines.forEach((line, i) => {
-                    if(i === 0 || !line.trim()) return;
-                    const p = line.split(',');
-                    if(p.length >= 4) {
-                        students.push({ id: Date.now() + i, roll: p[0].trim(), name: p[1].trim(), course: p[2].trim(), year: p[3].replace(/[^0-9]/g, '') });
-                        added++;
-                    }
-                });
-                localStorage.setItem('techie_db', JSON.stringify(students));
-                alert(`Imported ${added} Students!`);
-                closeModal('studentModal');
-                render();
-            };
-            reader.readAsText(input.files[0]);
-        }
+        const whatsappWindow = window.open('', '_blank');
+        const btn = document.getElementById('subBtn');
+        btn.disabled = true;
+        btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing...";
 
-        function checkAdmin() {
-            if(document.getElementById('pin').value === "1001") {
-                alert("Login Successful! Report system ready.");
-                closeModal('adminModal');
-            } else {
-                alert("Wrong PIN!");
+        try {
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            
+            const pCount = payload.filter(x => x.status === 'Present').length;
+            const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${payload.length - pCount}\n👥 *Total:* ${payload.length}`;
+            
+            if (whatsappWindow) {
+                whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
             }
+            
+            alert("Attendance Sync Successful!");
+            status = {};
+            render();
+        } catch (e) {
+            if (whatsappWindow) whatsappWindow.close();
+            alert("Error: Check Internet Connection");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = "<i class='fas fa-cloud-upload-alt mr-2'></i> Submit Attendance";
         }
-
-      async function submitSync() {
-            const t = document.getElementById('teacher').value.trim();
-            const c = document.getElementById('course').value;
-            const y = document.getElementById('year').value;
-            const slot = document.getElementById('slot').value;
-            const date = document.getElementById('attDate').value;
-
-            if(!t || !c || !y) return alert("Fill Teacher, Course & Year!");
-
-            const current = students.filter(x => x.course === c && x.year == y);
-            if(current.length === 0) return alert("No students to mark!");
-
-            const payload = [];
-            for(let s of current) {
-                if(!status[s.id]) return alert("Please mark attendance for: " + s.name);
-                payload.push({ date, course: c, year: y, slot, teacher: t, rollNo: s.roll, name: s.name, status: status[s.id] });
-            }
-
-            // 🔥 CHANGE HERE: Click hote hi turant blank window open hogi
-            const whatsappWindow = window.open('', '_blank');
-
-            const btn = document.getElementById('subBtn');
-            btn.disabled = true;
-            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing...";
-
-            try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                
-                // WhatsApp Summary Message
-                const pCount = payload.filter(x => x.status === 'Present').length;
-                const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${payload.length - pCount}\n👥 *Total:* ${payload.length}`;
-                
-                // 🔥 CHANGE HERE: Ab us window ka URL badal kar WhatsApp kar denge
-                if (whatsappWindow) {
-                    whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-                }
-                
-                alert("Attendance Sync Successful!");
-                status = {};
-                render();
-            } catch (e) {
-                // Agar error aaye toh blank window apne aap band ho jaye
-                if (whatsappWindow) whatsappWindow.close();
-                alert("Error: Check Internet Connection");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "<i class='fas fa-cloud-upload-alt mr-2'></i> Submit Attendance";
-            }
+    }
+    
+    function loadData() { 
+        const c = document.getElementById('course').value;
+        const y = document.getElementById('year').value;
+        if (c && y) {
+            status = {}; 
+            students.filter(x => x.course === c && x.year == y).forEach(x => {
+                status[x.id] = 'Absent'; 
+            });
         }
-        function loadData() { render(); }
+        render(); 
+    }
     </script>
 </body>
 </html>
