@@ -490,8 +490,15 @@
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             
             const pCount = payload.filter(x => x.status === 'Present').length;
-            const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${payload.length - pCount}\n👥 *Total:* ${payload.length}`;
-            
+const msg = `📊 *Attendance Summary*
+
+📅 *Date:* ${date}
+🕒 *Time:* ${time}
+🏫 *Class:* ${c} - Y${y}
+👨‍🏫 *Teacher:* ${t}
+✅ *Present:* ${pCount}
+❌ *Absent:* ${payload.length - pCount}
+👥 *Total:* ${payload.length}`;            
             if (whatsappWindow) {
                 whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
             }
