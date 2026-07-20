@@ -486,27 +486,33 @@
         btn.disabled = true;
         btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing...";
 
-        try {
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            
-            const pCount = payload.filter(x => x.status === 'Present').length;
-const msg = `📊 *Attendance Summary*
+    // ... baaki ka purana code upar ka ...
+
+try {
+    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+    
+    const pCount = payload.filter(x => x.status === 'Present').length;
+
+    // FIX: `${time}` ko badal kar `${slot}` kar diya hai
+    const msg = `📊 *Attendance Summary*
 
 📅 *Date:* ${date}
-🕒 *Time:* ${time}
+🕒 *Time:* ${slot}
 🏫 *Class:* ${c} - Y${y}
 👨‍🏫 *Teacher:* ${t}
 ✅ *Present:* ${pCount}
 ❌ *Absent:* ${payload.length - pCount}
 👥 *Total:* ${payload.length}`;            
-            if (whatsappWindow) {
-                whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-            }
-            
-            alert("Attendance Sync Successful!");
-            status = {};
-            render();
-        } catch (e) {
+    
+    if (whatsappWindow) {
+        whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    
+    alert("Attendance Sync Successful!");
+    status = {};
+    render();
+} catch (e) {
+// ... baaki ka purana code niche ka ...
             if (whatsappWindow) whatsappWindow.close();
             alert("Error: Check Internet Connection");
         } finally {
