@@ -340,7 +340,7 @@
         </div>
     </div>
 
-   <script>
+  <script>
     const SECRET_PIN = "Raicsit@1001"; 
 
     if(sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -526,7 +526,8 @@
         }
     }
 
-    async function submitSync() {
+    // 🚀 OPTIMIZED INSTANT SUBMIT & BACKGROUND SYNC
+    function submitSync() {
         const t = document.getElementById('teacher').value.trim();
         const c = document.getElementById('course').value;
         const y = document.getElementById('year').value;
@@ -540,56 +541,52 @@
         const current = students.filter(x => x.course === c && x.year == y);
         if(current.length === 0) return alert("No students to mark!");
 
-        // ✅ FIX: slot aur topic ko alag alag property mein split kiya hai
-        const payload = [];
-        for(let s of current) {
-            payload.push({ 
-                date, 
-                course: c, 
-                year: y, 
-                slot: slot, 
-                topic: topic || '', 
-                teacher: t, 
-                rollNo: s.roll, 
-                name: s.name, 
-                status: status[s.id] || 'Absent' 
-            });
-        }
+        const payload = current.map(s => ({
+            date, 
+            course: c, 
+            year: y, 
+            slot: slot, 
+            topic: topic || '', 
+            teacher: t, 
+            rollNo: s.roll, 
+            name: s.name, 
+            status: status[s.id] || 'Absent' 
+        }));
 
-        const whatsappWindow = window.open('', '_blank');
+        const pCount = payload.filter(x => x.status === 'Present').length;
+        const aCount = payload.length - pCount;
+
+        const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🕒 *Time Slot:* ${slot}${topic ? `\n📖 *Subject/Topic:* ${topic}` : ''}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${aCount}\n👥 *Total:* ${payload.length}`;
+
+        // 1. Instant WhatsApp Intent Launch (Prevents browser popup-blocker & delay)
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+
+        // 2. UI Feedback Update
         const btn = document.getElementById('subBtn');
         btn.disabled = true;
-        btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing...";
+        btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing in background...";
 
-        try {
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            
-            const pCount = payload.filter(x => x.status === 'Present').length;
-
-            const msg = `📊 *Attendance Summary*
-
-📅 *Date:* ${date}
-🕒 *Time Slot:* ${slot}${topic ? `\n📖 *Subject/Topic:* ${topic}` : ''}
-🏫 *Class:* ${c} - Y${y}
-👨‍🏫 *Teacher:* ${t}
-✅ *Present:* ${pCount}
-❌ *Absent:* ${payload.length - pCount}
-👥 *Total:* ${payload.length}`;            
-            
-            if (whatsappWindow) {
-                whatsappWindow.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-            }
-            
-            alert("Attendance Sync Successful!");
-            status = {};
-            render();
-        } catch (e) {
-            if (whatsappWindow) whatsappWindow.close();
-            alert("Error: Check Internet Connection");
-        } finally {
+        // 3. Background Non-Blocking Post Execution
+        fetch(API_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) 
+        })
+        .then(() => {
+            console.log("Sync request dispatched successfully!");
+        })
+        .catch(err => {
+            console.error("Sync Error:", err);
+            alert("Network issue: Check internet connectivity.");
+        })
+        .finally(() => {
             btn.disabled = false;
             btn.innerHTML = "<i class='fas fa-cloud-upload-alt mr-2'></i> Submit Attendance";
-        }
+            status = {};
+            render();
+        });
     }
     
     function loadData() { 
