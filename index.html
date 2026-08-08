@@ -125,6 +125,68 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(150,150,150,0.5); }
+
+        /* FIXED PRINT ENGINE STYLES */
+        @page {
+            size: auto;
+            margin: 15mm;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #reportModal, #reportModal * {
+                visibility: visible !important;
+            }
+            #reportModal {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                background: #ffffff !important;
+                display: block !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            #reportModal .glass {
+                background: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            #printableReport {
+                color: #000000 !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            #printableReport * {
+                color: #000000 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-top: 15px !important;
+            }
+            th, td {
+                border: 1px solid #000000 !important;
+                padding: 10px !important;
+                text-align: left !important;
+                font-size: 13px !important;
+            }
+            th {
+                background-color: #f2f2f2 !important;
+                font-weight: bold !important;
+            }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-orange-500 selection:text-white dark" id="appBody">
@@ -165,6 +227,9 @@
                 </button>
                 <button onclick="openModal('studentModal')" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border" title="Add / Import Students">
                     <i class="fas fa-user-plus text-lg text-theme transition-colors"></i>
+                </button>
+                <button onclick="openReportModal()" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border" title="View & Print Percentage Report">
+                    <i class="fas fa-print text-lg text-theme transition-colors"></i>
                 </button>
                 <button onclick="openModal('adminModal')" class="hover:bg-black/5 dark:hover:bg-white/10 p-3 rounded-xl transition-all border border-transparent hover:theme-border">
                     <i class="fas fa-chart-line text-lg text-theme transition-colors"></i>
@@ -242,7 +307,7 @@
                     <i class="fas fa-chevron-down absolute right-4 top-4 text-xs text-theme opacity-70 pointer-events-none"></i>
                 </div>
 
-                <!-- NEW: Dynamic Input Box when Time Slot Selected -->
+                <!-- Dynamic Input Box when Time Slot Selected -->
                 <div id="slotDetailsBox" class="relative transition-all duration-300">
                     <i class="fas fa-book-open absolute left-4 top-4 text-theme opacity-80 pointer-events-none"></i>
                     <input type="text" id="slotTopic" placeholder="Subject / Lecture Topic..." class="w-full p-3.5 pl-11 rounded-xl glass-input outline-none text-sm font-medium">
@@ -259,7 +324,6 @@
                     <button onclick="markAll('Absent')" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider border border-red-500/30 transition-all">Mark All A</button>
                 </div>
                 
-                <!-- NEW: Delete All Students Button -->
                 <button onclick="deleteAllStudents()" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-500 dark:text-red-400 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider border border-red-500/40 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-trash-alt"></i> Delete Selected Class Students
                 </button>
@@ -340,6 +404,47 @@
         </div>
     </div>
 
+    <!-- PRINTABLE PERCENTAGE REPORT MODAL -->
+    <div id="reportModal" class="modal px-4">
+        <div class="glass rounded-2xl w-full max-w-3xl overflow-hidden border theme-border shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="modal-header p-5 font-semibold flex justify-between items-center backdrop-blur-md no-print">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-file-invoice text-theme"></i> 
+                    <span class="text-main font-bold">Class Attendance Percentage Report</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="printReportDocument()" class="btn-submit px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                    <button onclick="closeModal('reportModal')" class="hover:bg-black/10 dark:hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-main"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            
+            <div id="printableReport" class="p-6 overflow-y-auto space-y-4">
+                <div class="text-center pb-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold uppercase tracking-wider">RAICSIT - Attendance Report</h2>
+                    <p id="reportClassTitle" class="text-sm font-semibold text-gray-600 mt-1">Class: Select Course and Year</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-black/5 dark:bg-white/5 text-left text-sm font-bold text-main">
+                                <th class="p-3 border border-gray-300">Roll No</th>
+                                <th class="p-3 border border-gray-300">Student Name</th>
+                                <th class="p-3 border border-gray-300">Course & Year</th>
+                                <th class="p-3 border border-gray-300 text-right">Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="text-sm text-main">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
   <script>
     const SECRET_PIN = "Raicsit@1001"; 
 
@@ -379,8 +484,9 @@
         document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
     }
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbwnet4oFltPJb7dL9YA5d5fpTIj3amBW-AvNjTLYaFwSxkbkS0ZUrANhhWKogjljnQk/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwacUeGo0Ar0pS7Ctf-22njJtB372qS-D36RfBiKM1_yGwG0vzYI0o07KGdD7__Sfck/exec";
     let students = JSON.parse(localStorage.getItem('techie_db')) || [];
+    let sheetPercentages = {}; 
     let status = {};
 
     document.getElementById('attDate').valueAsDate = new Date();
@@ -388,7 +494,37 @@
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-    // Time Slot Change Event Handler
+    // Fetch Calculated Percentage Data from Google Sheet API
+    async function fetchPercentageFromSheet() {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            sheetPercentages = {};
+            
+            data.forEach(row => {
+                const rollKey = String(row["Roll No"] || row["rollNo"] || "").trim();
+                const courseKey = String(row["Courses"] || row["course"] || "").trim().toUpperCase();
+                
+                let rawVal = row["% Summary"] !== undefined ? row["% Summary"] : 
+                             (row["% Summary "] !== undefined ? row["% Summary "] : 
+                             (row["Summary"] !== undefined ? row["Summary"] : row["Attendance %"]));
+
+                let pctVal = parseFloat(rawVal);
+                if(!isNaN(pctVal)) {
+                    if (pctVal <= 1 && pctVal > 0) {
+                        pctVal = pctVal * 100;
+                    }
+                    const uniqueKey = `${courseKey}_${rollKey}`;
+                    sheetPercentages[uniqueKey] = pctVal.toFixed(1);
+                    sheetPercentages[rollKey] = pctVal.toFixed(1);
+                }
+            });
+            render();
+        } catch (e) {
+            console.log("Sheet fetch skipped or offline mode active.", e);
+        }
+    }
+
     function handleTimeChange() {
         const slotVal = document.getElementById('slot').value;
         const topicInput = document.getElementById('slotTopic');
@@ -415,14 +551,25 @@
             return;
         }
 
-        list.innerHTML = filtered.map(item => `
+        list.innerHTML = filtered.map(item => {
+            const courseKey = String(item.course).toUpperCase();
+            const uniqueKey = `${courseKey}_${item.roll}`;
+            const pct = sheetPercentages[uniqueKey] !== undefined ? sheetPercentages[uniqueKey] : (sheetPercentages[item.roll] !== undefined ? sheetPercentages[item.roll] : '--');
+            const pctBadgeColor = pct !== '--' && parseFloat(pct) < 75 ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-green-500/10 text-green-500 border-green-500/30';
+
+            return `
             <div class="glass p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 ${status[item.id] ? (status[item.id] === 'Present' ? 'border-green-500 bg-green-500/5' : 'border-red-500 bg-red-500/5') : 'card-hover'} transition-all duration-300 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-theme-icon border theme-border flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-user text-theme"></i>
                     </div>
                     <div>
-                        <div class="font-semibold text-main text-base sm:text-lg tracking-wide transition-colors">${item.name}</div>
+                        <div class="font-semibold text-main text-base sm:text-lg tracking-wide transition-colors flex items-center gap-2">
+                            ${item.name}
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full border ${pctBadgeColor}">
+                                ${pct}%
+                            </span>
+                        </div>
                         <div class="text-[11px] sm:text-xs text-theme font-medium uppercase mt-0.5 tracking-widest flex items-center gap-1 opacity-90"><i class="fas fa-id-card"></i> ${item.roll}</div>
                     </div>
                 </div>
@@ -431,8 +578,43 @@
                     <button onclick="setAt(${item.id}, 'Absent')" class="flex-1 sm:w-16 sm:h-12 py-2.5 sm:py-0 rounded-xl font-bold text-sm transition-all duration-200 ${status[item.id] === 'Absent' ? 'bg-red-500 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-[1.02]' : 'btn-pa'}">A</button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
         updateUI();
+    }
+
+    function openReportModal() {
+        const c = document.getElementById('course').value;
+        const y = document.getElementById('year').value;
+
+        if(!c || !y) return alert("Pehle Course aur Year select karein report dekhne ke liye!");
+
+        document.getElementById('reportClassTitle').innerText = `Class: ${c} - ${y} Year`;
+        const filtered = students.filter(x => x.course === c && x.year == y);
+        const tbody = document.getElementById('reportTableBody');
+
+        if(filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">Is class me koi student nahi mila.</td></tr>`;
+        } else {
+            tbody.innerHTML = filtered.map(s => {
+                const uniqueKey = `${String(s.course).toUpperCase()}_${s.roll}`;
+                const pctVal = sheetPercentages[uniqueKey] || sheetPercentages[s.roll];
+                const pct = pctVal !== undefined ? `${pctVal}%` : 'N/A';
+                return `
+                    <tr class="border-b border-gray-200">
+                        <td class="p-3 border border-gray-300 font-semibold">${s.roll}</td>
+                        <td class="p-3 border border-gray-300">${s.name}</td>
+                        <td class="p-3 border border-gray-300">${s.course} - Y${s.year}</td>
+                        <td class="p-3 border border-gray-300 text-right font-bold">${pct}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        openModal('reportModal');
+    }
+
+    function printReportDocument() {
+        window.print();
     }
 
     function setAt(id, val) { status[id] = val; render(); }
@@ -450,7 +632,6 @@
         render();
     }
 
-    /* Delete Students functions */
     function deleteAllStudents() {
         const c = document.getElementById('course').value;
         const y = document.getElementById('year').value;
@@ -526,7 +707,6 @@
         }
     }
 
-    // 🚀 OPTIMIZED INSTANT SUBMIT & BACKGROUND SYNC
     function submitSync() {
         const t = document.getElementById('teacher').value.trim();
         const c = document.getElementById('course').value;
@@ -558,16 +738,13 @@
 
         const msg = `📊 *Attendance Summary*\n\n📅 *Date:* ${date}\n🕒 *Time Slot:* ${slot}${topic ? `\n📖 *Subject/Topic:* ${topic}` : ''}\n🏫 *Class:* ${c} - Y${y}\n👨‍🏫 *Teacher:* ${t}\n✅ *Present:* ${pCount}\n❌ *Absent:* ${aCount}\n👥 *Total:* ${payload.length}`;
 
-        // 1. Instant WhatsApp Intent Launch (Prevents browser popup-blocker & delay)
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
         window.open(waUrl, '_blank');
 
-        // 2. UI Feedback Update
         const btn = document.getElementById('subBtn');
         btn.disabled = true;
         btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Syncing in background...";
 
-        // 3. Background Non-Blocking Post Execution
         fetch(API_URL, { 
             method: 'POST', 
             mode: 'no-cors', 
@@ -576,6 +753,7 @@
         })
         .then(() => {
             console.log("Sync request dispatched successfully!");
+            setTimeout(fetchPercentageFromSheet, 2000);
         })
         .catch(err => {
             console.error("Sync Error:", err);
@@ -597,9 +775,12 @@
             students.filter(x => x.course === c && x.year == y).forEach(x => {
                 status[x.id] = 'Absent'; 
             });
+            fetchPercentageFromSheet();
         }
         render(); 
     }
+
+    fetchPercentageFromSheet();
 </script>
 </body>
 </html>
