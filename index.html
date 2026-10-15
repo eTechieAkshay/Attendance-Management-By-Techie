@@ -192,8 +192,24 @@
 <body class="antialiased selection:bg-orange-500 selection:text-white dark" id="appBody">
 
     <!-- GLOBAL LOGIN LOCK -->
-    <div id="globalLock" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center px-4 transition-opacity duration-500">
-        <div class="glass p-8 rounded-2xl max-w-sm w-full text-center border border-white/10 shadow-2xl">
+    <div id="globalLock" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center px-4 py-6 overflow-y-auto transition-opacity duration-500">
+      <div class="my-auto w-full max-w-sm flex flex-col gap-4">
+
+        <!-- STUDENT: CHECK ATTENDANCE (no login needed) - shown below faculty login -->
+        <div class="order-2 glass p-6 rounded-2xl w-full text-center border border-white/10 shadow-2xl">
+            <div class="w-14 h-14 mx-auto bg-orange-500/20 rounded-full flex items-center justify-center mb-3">
+                <i class="fas fa-user-graduate text-xl text-orange-400"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-1">Student Attendance</h2>
+            <p class="text-sm text-gray-300 mb-4">Type Student Full Name </p>
+            <input type="text" id="stuName" placeholder="Student name" autocomplete="off" onkeydown="if(event.key==='Enter') checkStudentAttendance()" class="w-full p-3.5 rounded-xl bg-white/5 border border-white/10 text-white text-center font-semibold outline-none focus:border-orange-400 mb-3">
+            <button id="stuBtn" onclick="checkStudentAttendance()" class="w-full bg-orange-500 hover:bg-orange-400 text-white py-3 rounded-xl font-bold uppercase tracking-wider transition-all">
+                Check Attendance
+            </button>
+            <div id="stuResult" class="mt-4 space-y-2 text-left"></div>
+        </div>
+
+        <div class="order-1 glass p-8 rounded-2xl w-full text-center border border-white/10 shadow-2xl">
             <div class="w-16 h-16 mx-auto bg-indigo-500/20 rounded-full flex items-center justify-center mb-4">
                 <i class="fas fa-lock text-2xl text-indigo-400"></i>
             </div>
@@ -207,6 +223,7 @@
             </button>
             <p id="errorMsg" class="text-red-400 text-sm mt-3 hidden font-medium">Incorrect PIN!</p>
         </div>
+      </div>
     </div>
 
     <!-- Top Toolbar (Glassmorphism Nav) -->
@@ -456,6 +473,7 @@
         const input = document.getElementById('appPin').value;
         if(input === SECRET_PIN) {
             sessionStorage.setItem('isLoggedIn', 'true');
+            fetchPercentageFromSheet();
             const lock = document.getElementById('globalLock');
             lock.style.opacity = '0';
             setTimeout(() => lock.style.display = 'none', 500);
@@ -497,8 +515,7 @@
     // Fetch Calculated Percentage Data from Google Sheet API
     async function fetchPercentageFromSheet() {
         try {
-            const res = await fetch(API_URL);
-            const data = await res.json();
+            const data = await getSheetRows(true);
             sheetPercentages = {};
             
             data.forEach(row => {
@@ -522,6 +539,103 @@
             render();
         } catch (e) {
             console.log("Sheet fetch skipped or offline mode active.", e);
+        }
+    }
+
+    // ===== SHARED SHEET FETCH (cached, loads once at page open) =====
+    let sheetRows = null, sheetRowsPromise = null;
+    function getSheetRows(force) {
+        if (!force && sheetRows) return Promise.resolve(sheetRows);
+        if (sheetRowsPromise) return sheetRowsPromise;
+        sheetRowsPromise = fetch(API_URL)
+            .then(r => r.text())
+            .then(t => {
+                let d;
+                try { d = JSON.parse(t); } catch (e) { console.error('Non-JSON response from API:', t.slice(0, 300)); throw new Error('API ne JSON nahi diya'); }
+                sheetRows = d;
+                return d;
+            })
+            .finally(() => { sheetRowsPromise = null; });
+        return sheetRowsPromise;
+    }
+
+    // ===== STUDENT PUBLIC CHECK (no login) =====
+    const normName = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function pickName(row) {
+        const k = Object.keys(row).find(key => /name/i.test(key) && !/teacher|faculty/i.test(key));
+        return k ? String(row[k]).trim() : '';
+    }
+    function pickPercent(row) {
+        const keys = ["% Summary", "% Summary ", "Summary", "Attendance %"];
+        let raw;
+        for (const k of keys) { if (row[k] !== undefined && row[k] !== '') { raw = row[k]; break; } }
+        if (raw === undefined) return null;
+        if (typeof raw === 'string' && raw.includes('%')) return raw.trim();
+        let v = parseFloat(raw);
+        if (isNaN(v)) return null;
+        if (v <= 1 && v > 0) v = v * 100;
+        return parseFloat(v.toFixed(2)) + '%';
+    }
+
+    async function checkStudentAttendance() {
+        const out = document.getElementById('stuResult');
+        const btn = document.getElementById('stuBtn');
+        const q = normName(document.getElementById('stuName').value);
+        if (q.length < 3) { out.innerHTML = '<p class="text-yellow-300 text-sm text-center">Kam se kam 3 akshar ka naam likho.</p>'; return; }
+
+        btn.disabled = true;
+        out.innerHTML = '<p class="text-gray-300 text-sm text-center"><i class="fas fa-spinner fa-spin mr-1"></i> Please Wait...</p>';
+        try {
+            // Server-side lookup: Apps Script returns only Student Name + Overall % for this name
+            window._stuCache = window._stuCache || {};
+            const cached = window._stuCache[q];
+            let data;
+            if (cached && Date.now() - cached.t < 5 * 60 * 1000) {
+                data = cached.d;   // isi naam ka result pehle mil chuka hai, turant dikhao
+            } else {
+                const ctrl = new AbortController();
+                const timer = setTimeout(() => ctrl.abort(), 45000);
+                let txt;
+                try {
+                    const res = await fetch(API_URL + '?name=' + encodeURIComponent(document.getElementById('stuName').value.trim()), { signal: ctrl.signal });
+                    txt = await res.text();
+                } catch (err) {
+                    throw new Error(err.name === 'AbortError' ? 'timeout' : err.message);
+                } finally { clearTimeout(timer); }
+
+                try { data = JSON.parse(txt); } catch (err) { console.error('Non-JSON:', txt.slice(0, 300)); throw new Error('API ne JSON nahi diya'); }
+                if (Array.isArray(data)) window._stuCache[q] = { d: data, t: Date.now() };
+            }
+            const hits = Array.isArray(data) ? data : [];
+
+            if (hits.length && hits[0].overall === undefined) {
+                out.innerHTML = '<p class="text-yellow-300 text-sm text-center">Apps Script abhi update nahi hua. Naya code paste karke "New version" deploy karo.</p>';
+            } else if (hits.length === 0) {
+                out.innerHTML = '<p class="text-red-300 text-sm text-center">Is naam ka student nahi mila. Spelling check karo.</p>';
+            } else {
+                out.innerHTML = hits.map(r => {
+                    const pct = String(r.overall || '').trim();
+                    const num = parseFloat(pct);
+                    const color = isNaN(num) ? 'text-gray-300' : (num < 75 ? 'text-red-400' : 'text-green-400');
+                    const sub = [r.sheet, r.roll ? 'Roll ' + r.roll : ''].filter(Boolean).join(' • ');
+                    return `<div class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-white font-semibold">${escHtml(r.name)}</div>
+                            <div class="text-xs text-gray-400 mt-0.5">${escHtml(sub)}</div>
+                        </div>
+                        <div class="text-2xl font-bold ${color}">${pct ? escHtml(pct) : '--'}</div>
+                    </div>`;
+                }).join('');
+            }
+        } catch (e) {
+            console.error(e);
+            out.innerHTML = e.message === 'timeout'
+                ? '<p class="text-red-300 text-sm text-center">Server bahut slow hai. 1 minute baad dobara try karo.</p>'
+                : '<p class="text-red-300 text-sm text-center">Data load nahi hua (' + escHtml(e.message) + '). Dobara try karo.</p>';
+        } finally {
+            btn.disabled = false;
         }
     }
 
@@ -780,7 +894,13 @@
         render(); 
     }
 
-    fetchPercentageFromSheet();
+    // Student screen: sirf Apps Script ko jaga do + cache banwa do (heavy faculty data nahi mangte)
+    // Faculty pehle se logged in ho to purana data load hota hai.
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        fetchPercentageFromSheet();
+    } else {
+        fetch(API_URL + '?name=__warmup__').catch(() => {});
+    }
 </script>
 </body>
 </html>
