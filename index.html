@@ -551,7 +551,7 @@
             .then(r => r.text())
             .then(t => {
                 let d;
-                try { d = JSON.parse(t); } catch (e) { console.error('Non-JSON response from API:', t.slice(0, 300)); throw new Error('API ne JSON nahi diya'); }
+                try { d = JSON.parse(t); } catch (e) { console.error('Non-JSON response from API:', t.slice(0, 300)); throw new Error('Please Try Again'); }
                 sheetRows = d;
                 return d;
             })
@@ -583,7 +583,7 @@
         const out = document.getElementById('stuResult');
         const btn = document.getElementById('stuBtn');
         const q = normName(document.getElementById('stuName').value);
-        if (q.length < 3) { out.innerHTML = '<p class="text-yellow-300 text-sm text-center">Kam se kam 3 akshar ka naam likho.</p>'; return; }
+        if (q.length < 3) { out.innerHTML = '<p class="text-yellow-300 text-sm text-center">Type Name Proper.</p>'; return; }
 
         btn.disabled = true;
         out.innerHTML = '<p class="text-gray-300 text-sm text-center"><i class="fas fa-spinner fa-spin mr-1"></i> Please Wait...</p>';
@@ -605,15 +605,15 @@
                     throw new Error(err.name === 'AbortError' ? 'timeout' : err.message);
                 } finally { clearTimeout(timer); }
 
-                try { data = JSON.parse(txt); } catch (err) { console.error('Non-JSON:', txt.slice(0, 300)); throw new Error('API ne JSON nahi diya'); }
+                try { data = JSON.parse(txt); } catch (err) { console.error('Non-JSON:', txt.slice(0, 300)); throw new Error('Please Try Again'); }
                 if (Array.isArray(data)) window._stuCache[q] = { d: data, t: Date.now() };
             }
             const hits = Array.isArray(data) ? data : [];
 
             if (hits.length && hits[0].overall === undefined) {
-                out.innerHTML = '<p class="text-yellow-300 text-sm text-center">Apps Script abhi update nahi hua. Naya code paste karke "New version" deploy karo.</p>';
+                out.innerHTML = '<p class="text-yellow-300 text-sm text-center">Wait For Response.</p>';
             } else if (hits.length === 0) {
-                out.innerHTML = '<p class="text-red-300 text-sm text-center">Is naam ka student nahi mila. Spelling check karo.</p>';
+                out.innerHTML = '<p class="text-red-300 text-sm text-center">Name Is Not Match.</p>';
             } else {
                 out.innerHTML = hits.map(r => {
                     const pct = String(r.overall || '').trim();
@@ -632,8 +632,8 @@
         } catch (e) {
             console.error(e);
             out.innerHTML = e.message === 'timeout'
-                ? '<p class="text-red-300 text-sm text-center">Server bahut slow hai. 1 minute baad dobara try karo.</p>'
-                : '<p class="text-red-300 text-sm text-center">Data load nahi hua (' + escHtml(e.message) + '). Dobara try karo.</p>';
+                ? '<p class="text-red-300 text-sm text-center">Please Try Again Later.</p>'
+                : '<p class="text-red-300 text-sm text-center">Loading (' + escHtml(e.message) + '). Try Now.</p>';
         } finally {
             btn.disabled = false;
         }
